@@ -1,0 +1,52 @@
+[
+  {
+    "event_time": "2026-09-26T14:54:12.125",
+    "line_id": "LINEA_1",
+    "event_type": "connection",
+    "code_type": "SN",
+    "code": "",
+    "message": "Conexion activa: remoto=192.168.1.10:6000 tipo=SN",
+    "ip": "192.168.1.10",
+    "port": "6000"
+  },
+  {
+    "event_time": "2026-09-26T14:55:01.452",
+    "line_id": "LINEA_1",
+    "event_type": "sent",
+    "code_type": "SN",
+    "code": "55N2617FNH00336",
+    "message": "window=ok edit=ok set_text=ok enter_down=ok enter_up=ok",
+    "ip": "192.168.1.10",
+    "port": "6000"
+  },
+  {
+    "event_time": "2026-09-26T14:56:31.238",
+    "line_id": "LINEA_1",
+    "event_type": "app",
+    "code_type": "SN",
+    "code": "",
+    "message": "Codigo rechazado: GVMP",
+    "ip": "192.168.1.10",
+    "port": "6000"
+  },
+  {
+    "event_time": "2026-09-26T15:01:20.442",
+    "line_id": "LINEA_2",
+    "event_type": "sent",
+    "code_type": "SN",
+    "code": "65N26112VH00088",
+    "message": "window=ok edit=ok set_text=ok enter_down=ok enter_up=ok",
+    "ip": "192.168.1.11",
+    "port": "6001"
+  },
+  {
+    "event_time": "2026-09-26T15:03:44.911",
+    "line_id": "LINEA_2",
+    "event_type": "connection",
+    "code_type": "SN",
+    "code": "",
+    "message": "Fallo envio a HSmartTest: HSmartTest no encontrado",
+    "ip": "192.168.1.11",
+    "port": "6001"
+  }
+]

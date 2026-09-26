@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grabado de serie - Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Grabado de serie</h1>
+      <p id="dataSource">Datos de ejemplo</p>
+    </div>
+    <div class="status-pill" id="loadStatus">
+      <span class="dot"></span>
+      <span>Cargando</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="toolbar" aria-label="Filtros">
+      <label>
+        Linea
+        <select id="lineFilter"></select>
+      </label>
+      <label>
+        Evento
+        <select id="eventFilter"></select>
+      </label>
+      <label>
+        Fecha
+        <input id="dateFilter" type="date">
+      </label>
+      <label class="search">
+        Buscar SN / mensaje
+        <input id="searchInput" type="search" placeholder="55N..., error, rechazado">
+      </label>
+      <button id="reloadButton" type="button">Actualizar</button>
+    </section>
+
+    <section class="metrics" aria-label="Resumen">
+      <article class="metric">
+        <span class="metric-label">OK hoy</span>
+        <strong id="okCount">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Rechazados</span>
+        <strong id="rejectCount">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Fallos envio</span>
+        <strong id="sendFailCount">0</strong>
+      </article>
+      <article class="metric">
+        <span class="metric-label">Ultimo evento</span>
+        <strong id="lastEvent">--:--</strong>
+      </article>
+    </section>
+
+    <section class="split">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Lineas</h2>
+          <span id="lineCount">0</span>
+        </div>
+        <div id="lineList" class="line-list"></div>
+      </div>
+
+      <div class="panel table-panel">
+        <div class="panel-head">
+          <h2>Eventos</h2>
+          <span id="eventCount">0</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Linea</th>
+                <th>Tipo</th>
+                <th>Codigo</th>
+                <th>Mensaje</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
