@@ -1,10 +1,11 @@
 import json
 import os
+import shutil
 import threading
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 
@@ -18,8 +19,11 @@ class CloudLogUploader:
         self.app_dir = Path(app_dir)
         self.config = config
         self.enabled = self._is_enabled()
+        self.mode = config.get("CloudMode", "folder").strip().lower()
         self.upload_received = self._as_bool(config.get("CloudUploadReceived", "false"))
         self.line_id = config.get("CloudLineId", "LINEA_1")
+        self.folder_path = Path(config.get("CloudFolderPath", "")).expanduser()
+        self.copy_today_logs = self._as_bool(config.get("CloudCopyTodayLogs", "true"))
         self.table = config.get("CloudSupabaseTable", "tcp_client_events")
         self.supabase_url = config.get("CloudSupabaseUrl", "").rstrip("/")
         self.supabase_key = config.get("CloudSupabaseKey", "")
@@ -69,6 +73,10 @@ class CloudLogUploader:
             self.flush_once()
 
     def flush_once(self):
+        if self.mode == "folder":
+            self._copy_log_files()
+            return
+
         if not self._has_upload_config():
             return
         batch, remaining = self._read_batch()
@@ -142,7 +150,40 @@ class CloudLogUploader:
             return False
 
     def _has_upload_config(self):
-        return bool(self.supabase_url and self.supabase_key and self.table)
+        return bool(self.mode == "supabase" and self.supabase_url and self.supabase_key and self.table)
+
+    def _copy_log_files(self):
+        if not self.folder_path:
+            return
+
+        log_dir = self.app_dir / "Logs"
+        if not log_dir.exists():
+            return
+
+        dates = [datetime.now().date()]
+        yesterday = datetime.now().date() - timedelta(days=1)
+        if yesterday not in dates:
+            dates.append(yesterday)
+
+        for log_date in dates:
+            if log_date == datetime.now().date() and not self.copy_today_logs:
+                continue
+            date_text = log_date.strftime("%Y-%m-%d")
+            destination_dir = self.folder_path / self.line_id / date_text
+            for prefix in ("TcpClientLog", "ReceivedLog", "SentLog", "ConnectionLog"):
+                source = log_dir / f"{prefix}_{date_text}.txt"
+                if source.exists():
+                    self._copy_file_atomic(source, destination_dir / source.name)
+
+    @staticmethod
+    def _copy_file_atomic(source, destination):
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            temp_destination = destination.with_suffix(destination.suffix + ".tmp")
+            shutil.copy2(str(source), str(temp_destination))
+            temp_destination.replace(destination)
+        except OSError:
+            pass
 
     def _is_enabled(self):
         return self._as_bool(self.config.get("CloudLogsEnabled", "false"))

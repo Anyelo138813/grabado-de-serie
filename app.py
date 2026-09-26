@@ -391,7 +391,10 @@ class App(tk.Tk):
             "LastIP": config.get("Settings", "LastIP", fallback="192.168."),
             "LastPort": config.get("Settings", "LastPort", fallback="6000"),
             "CloudLogsEnabled": config.get("CloudLogs", "Enabled", fallback="false"),
+            "CloudMode": config.get("CloudLogs", "Mode", fallback="folder"),
             "CloudLineId": config.get("CloudLogs", "LineId", fallback="LINEA_1"),
+            "CloudFolderPath": config.get("CloudLogs", "FolderPath", fallback=""),
+            "CloudCopyTodayLogs": config.get("CloudLogs", "CopyTodayLogs", fallback="true"),
             "CloudUploadReceived": config.get("CloudLogs", "UploadReceived", fallback="false"),
             "CloudFlushIntervalSeconds": config.get("CloudLogs", "FlushIntervalSeconds", fallback="60"),
             "CloudBatchSize": config.get("CloudLogs", "BatchSize", fallback="25"),
@@ -408,7 +411,10 @@ class App(tk.Tk):
         }
         config["CloudLogs"] = {
             "Enabled": self.settings.get("CloudLogsEnabled", "false"),
+            "Mode": self.settings.get("CloudMode", "folder"),
             "LineId": self.settings.get("CloudLineId", "LINEA_1"),
+            "FolderPath": self.settings.get("CloudFolderPath", ""),
+            "CopyTodayLogs": self.settings.get("CloudCopyTodayLogs", "true"),
             "UploadReceived": self.settings.get("CloudUploadReceived", "false"),
             "FlushIntervalSeconds": self.settings.get("CloudFlushIntervalSeconds", "60"),
             "BatchSize": self.settings.get("CloudBatchSize", "25"),

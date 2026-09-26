@@ -17,6 +17,7 @@ dist*/
 # Runtime logs
 Logs/
 CloudQueue/
+CloudCopyTest/
 *.log
 
 # Local generated archives and executables

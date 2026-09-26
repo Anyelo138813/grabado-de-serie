@@ -1,0 +1,38 @@
+LOGS EN NUBE POR CARPETA SINCRONIZADA
+=====================================
+
+Modo recomendado para produccion:
+  Usar OneDrive, Google Drive, Dropbox o una carpeta compartida de red.
+
+La app no sube directo a internet. Solo copia los logs a una carpeta local
+sincronizada. El programa de nube se encarga de subirlos despues.
+
+Ventajas:
+  - Muy bajo consumo.
+  - Si no hay internet, la app TCP sigue trabajando.
+  - No necesita base de datos.
+  - Mantiene logs locales como respaldo.
+
+Configuracion en settings.ini:
+
+  [CloudLogs]
+  enabled = true
+  mode = folder
+  lineid = LINEA_1
+  folderpath = C:\Users\user\OneDrive\HisenseLogs
+  copytodaylogs = true
+  flushintervalseconds = 60
+
+Estructura creada:
+
+  C:\Users\user\OneDrive\HisenseLogs\LINEA_1\2026-09-26\
+    TcpClientLog_2026-09-26.txt
+    ReceivedLog_2026-09-26.txt
+    SentLog_2026-09-26.txt
+    ConnectionLog_2026-09-26.txt
+
+Notas:
+  - Cambia lineid por la linea real: LINEA_1, LINEA_2, etc.
+  - Usa una carpeta distinta por planta o proyecto si es necesario.
+  - Si copytodaylogs = true, copia tambien los logs del dia en curso.
+  - Si copytodaylogs = false, solo copia los logs del dia anterior.
