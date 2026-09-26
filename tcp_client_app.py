@@ -113,10 +113,15 @@ class TcpClientApp:
             sent = send_keys_manager.send(code)
             if sent:
                 if hasattr(self.ui, "append_sent_log"):
-                    self.ui.append_sent_log(code)
+                    self.ui.append_sent_log(code, getattr(sent, "detail", ""))
+                if hasattr(self.ui, "append_connection_log"):
+                    self.ui.append_connection_log("Envio a HSmartTest: " + getattr(sent, "detail", "OK"))
                 self.ui.append_log("Codigo OK: " + code)
             else:
-                self.ui.append_log("Codigo valido, pero no se encontro HSmartTest: " + code)
+                detail = getattr(sent, "detail", "No se pudo enviar a HSmartTest")
+                if hasattr(self.ui, "append_connection_log"):
+                    self.ui.append_connection_log("Fallo envio a HSmartTest: " + detail)
+                self.ui.append_log("Codigo valido, pero no se envio a HSmartTest: " + code)
         else:
             self.ui.append_log("Codigo rechazado: " + code)
 

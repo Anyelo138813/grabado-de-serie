@@ -282,9 +282,10 @@ class App(tk.Tk):
         # caracteres especiales sin modificar el dato usado por el programa.
         self._append_file_log(self._get_received_log_path(), f"len={len(raw)} data={repr(raw)}")
 
-    def append_sent_log(self, code):
+    def append_sent_log(self, code, detail=""):
         code_type = self.active_code_type or self.get_code_type()
-        self._append_file_log(self._get_sent_log_path(), f"tipo={code_type} len={len(code)} data={code}")
+        extra = f" detalle={detail}" if detail else ""
+        self._append_file_log(self._get_sent_log_path(), f"tipo={code_type} len={len(code)} data={code}{extra}")
 
     def append_connection_log(self, msg):
         self._append_file_log(self._get_connection_log_path(), msg)
@@ -393,13 +394,13 @@ class App(tk.Tk):
     def _on_close(self):
         password = simpledialog.askstring(
             "Cerrar aplicacion",
-            "Ingrese la contraseña para cerrar:",
+            "Ingrese la contrasena para cerrar:",
             show="*",
             parent=self,
         )
         if password != CLOSE_PASSWORD:
             if password is not None:
-                messagebox.showerror("Contraseña incorrecta", "La contraseña no es correcta.", parent=self)
+                messagebox.showerror("Contrasena incorrecta", "La contrasena no es correcta.", parent=self)
             return
 
         self.closing = True
