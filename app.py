@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from tkinter import messagebox, simpledialog, ttk
 
+from cloud_log_uploader import CloudLogUploader
 from tcp_client_app import CODE_PATTERN, TcpClientApp
 
 
@@ -48,6 +49,8 @@ class App(tk.Tk):
         self.active_expected_length = None
         self.settings = self._load_settings()
         LOG_DIR.mkdir(parents=True, exist_ok=True)
+        self.cloud_logger = CloudLogUploader(APP_DIR, self.settings)
+        self.cloud_logger.start()
 
         self._build_ui()
         self.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -276,19 +279,23 @@ class App(tk.Tk):
                 f.write(line + os.linesep)
         except OSError:
             pass
+        self._record_cloud_event("app", msg)
 
     def append_received_log(self, raw):
         # Guarda lo recibido antes de cualquier validacion. repr muestra CR/LF y
         # caracteres especiales sin modificar el dato usado por el programa.
         self._append_file_log(self._get_received_log_path(), f"len={len(raw)} data={repr(raw)}")
+        self._record_cloud_event("received", f"len={len(raw)} data={repr(raw)}")
 
     def append_sent_log(self, code, detail=""):
         code_type = self.active_code_type or self.get_code_type()
         extra = f" detalle={detail}" if detail else ""
         self._append_file_log(self._get_sent_log_path(), f"tipo={code_type} len={len(code)} data={code}{extra}")
+        self._record_cloud_event("sent", detail or "Codigo enviado a HSmartTest", code=code)
 
     def append_connection_log(self, msg):
         self._append_file_log(self._get_connection_log_path(), msg)
+        self._record_cloud_event("connection", msg)
 
     @staticmethod
     def _append_file_log(path, msg):
@@ -383,13 +390,49 @@ class App(tk.Tk):
         return {
             "LastIP": config.get("Settings", "LastIP", fallback="192.168."),
             "LastPort": config.get("Settings", "LastPort", fallback="6000"),
+            "CloudLogsEnabled": config.get("CloudLogs", "Enabled", fallback="false"),
+            "CloudLineId": config.get("CloudLogs", "LineId", fallback="LINEA_1"),
+            "CloudUploadReceived": config.get("CloudLogs", "UploadReceived", fallback="false"),
+            "CloudFlushIntervalSeconds": config.get("CloudLogs", "FlushIntervalSeconds", fallback="60"),
+            "CloudBatchSize": config.get("CloudLogs", "BatchSize", fallback="25"),
+            "CloudSupabaseUrl": config.get("CloudLogs", "SupabaseUrl", fallback=""),
+            "CloudSupabaseKey": config.get("CloudLogs", "SupabaseKey", fallback=""),
+            "CloudSupabaseTable": config.get("CloudLogs", "SupabaseTable", fallback="tcp_client_events"),
         }
 
     def _save_settings(self):
         config = configparser.ConfigParser()
-        config["Settings"] = self.settings
+        config["Settings"] = {
+            "LastIP": self.settings.get("LastIP", "192.168."),
+            "LastPort": self.settings.get("LastPort", "6000"),
+        }
+        config["CloudLogs"] = {
+            "Enabled": self.settings.get("CloudLogsEnabled", "false"),
+            "LineId": self.settings.get("CloudLineId", "LINEA_1"),
+            "UploadReceived": self.settings.get("CloudUploadReceived", "false"),
+            "FlushIntervalSeconds": self.settings.get("CloudFlushIntervalSeconds", "60"),
+            "BatchSize": self.settings.get("CloudBatchSize", "25"),
+            "SupabaseUrl": self.settings.get("CloudSupabaseUrl", ""),
+            "SupabaseKey": self.settings.get("CloudSupabaseKey", ""),
+            "SupabaseTable": self.settings.get("CloudSupabaseTable", "tcp_client_events"),
+        }
         with CONFIG_PATH.open("w", encoding="utf-8") as f:
             config.write(f)
+
+    def _record_cloud_event(self, event_type, message, code=""):
+        if not hasattr(self, "cloud_logger"):
+            return
+        try:
+            self.cloud_logger.record(
+                event_type=event_type,
+                message=message,
+                code_type=self.active_code_type or self.get_code_type(),
+                code=code,
+                ip=self.active_ip or self.txt_server_ip.get().strip(),
+                port=self.active_port or self.txt_server_port.get().strip(),
+            )
+        except Exception:
+            pass
 
     def _on_close(self):
         password = simpledialog.askstring(
@@ -406,6 +449,8 @@ class App(tk.Tk):
         self.closing = True
         self.auto_reconnect_enabled = False
         self._cancel_reconnect()
+        self.cloud_logger.flush_once()
+        self.cloud_logger.stop()
         self.client.disconnect()
         self.destroy()
 
