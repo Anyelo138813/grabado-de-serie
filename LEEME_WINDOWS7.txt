@@ -1,0 +1,16 @@
+TCP Client Hisense - Windows 7
+================================
+
+Ejecuta:
+  TCP Client Hisense W7 x86.exe
+
+Compatibilidad:
+  - Windows 7 SP1 de 32 bits.
+  - Windows 7 SP1 de 64 bits.
+  - No requiere instalar Python.
+
+Copia la carpeta completa a la computadora destino. El archivo settings.ini
+debe permanecer junto al EXE. Los logs se crean en la carpeta Logs.
+
+Si Windows muestra un error de DLL al abrir, instala todas las actualizaciones
+de Windows 7 SP1, incluyendo Universal C Runtime (KB2999226).

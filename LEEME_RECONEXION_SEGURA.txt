@@ -1,0 +1,28 @@
+TCP Client Hisense - variante con reconexion segura
+====================================================
+
+Esta carpeta es una copia separada de python_version con cambios enfocados en
+diagnostico y recuperacion ante caidas TCP.
+
+Cambios principales:
+  - Si la conexion TCP se cae de forma inesperada, la app intenta reconectar
+    cada 3 segundos usando la misma IP y puerto.
+  - Si el usuario presiona Disconnect o cierra la app, no hay reconexion
+    automatica.
+  - Se evita programar varios reintentos al mismo tiempo.
+  - El log normal conserva los eventos principales.
+  - Se agrega Logs\ConnectionLog_YYYY-MM-DD.txt con detalles tecnicos de
+    conexion, desconexion y reintentos.
+  - ReceivedLog ahora guarda longitud y dato crudo recibido.
+  - SentLog ahora guarda tipo de codigo, longitud y dato enviado.
+
+Archivos de log:
+  - TcpClientLog_YYYY-MM-DD.txt: eventos visibles de operacion.
+  - ReceivedLog_YYYY-MM-DD.txt: datos crudos recibidos por TCP.
+  - SentLog_YYYY-MM-DD.txt: codigos enviados a HSmartTest.
+  - ConnectionLog_YYYY-MM-DD.txt: conexion, cierre remoto, errores y reintentos.
+
+Nota:
+  La reconexion no corrige la causa raiz si el servidor TCP, red, firewall o
+  iVMS dejan de entregar datos. Su objetivo es recuperar la operacion cuando el
+  servicio vuelve a aceptar la conexion.

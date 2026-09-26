@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+.env
+
+# PyInstaller/build outputs
+build*/
+dist*/
+*.spec.bak
+
+# Runtime logs
+Logs/
+*.log
+
+# Local generated archives and executables
+*.exe
+*.rar
+*.zip
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

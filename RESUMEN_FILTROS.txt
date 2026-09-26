@@ -1,0 +1,117 @@
+RESUMEN DE FILTROS Y COMPORTAMIENTO
+===================================
+
+Portable actualizado:
+  python_version\portable_exe\TCP Client Hisense.exe
+
+Ultima compilacion verificada:
+  21/6/2026 10:19:27 a. m.
+
+
+FILTRO SN
+---------
+Para que un codigo SN sea aceptado debe cumplir todo esto:
+
+  1. Longitud exacta: 15 caracteres.
+  2. Solo letras mayusculas A-Z y numeros 0-9.
+  3. Debe iniciar con una de estas formas:
+       - 2 numeros + 1 letra, ejemplo: 65N
+       - letra A + 1 numero, ejemplo: A1
+       - letra B + 1 numero, ejemplo: B9
+  4. El caracter 10 debe ser H.
+
+Ejemplos aceptados:
+  65N26112VH00088
+  55N25183RH00005
+  A1261123VH00088
+  B9261123VH00088
+
+Ejemplos rechazados:
+  65N26112VJ00088   -> caracter 10 no es H
+  65#26112VH00088   -> contiene #
+  65126112VH00088   -> no cumple inicio 2 numeros + 1 letra
+  C1261123VH00088   -> no inicia con A+numero ni B+numero
+
+
+FILTRO DSN
+----------
+Para que un codigo DSN sea aceptado debe cumplir todo esto:
+
+  1. Longitud exacta: 16 caracteres.
+  2. Solo letras mayusculas A-Z y numeros 0-9.
+  3. Debe iniciar exactamente con G5T.
+
+Ejemplos aceptados:
+  G5T1234567890123
+
+Ejemplos rechazados:
+  G6T1234567890123  -> no inicia con G5T
+  G5X1234567890123  -> no inicia con G5T
+  G5T123456789012   -> longitud incorrecta
+
+
+FILTRO 3TE
+----------
+Para que un codigo 3TE sea aceptado debe cumplir todo esto:
+
+  1. Longitud exacta: 23 caracteres.
+  2. Solo letras mayusculas A-Z y numeros 0-9.
+  3. Debe iniciar exactamente con 3TE.
+
+Ejemplos aceptados:
+  3TE12345678901234567890
+
+Ejemplos rechazados:
+  4TE12345678901234567890 -> no inicia con 3TE
+
+
+BUFFER / DATOS RECIBIDOS
+------------------------
+No hay buffer acumulado.
+No se guardan pedazos para completarlos despues.
+No se limpia el dato recibido.
+No se quita # ni ningun otro caracter.
+
+Comportamiento:
+
+  1. La app recibe un bloque TCP.
+  2. Guarda lo recibido tal cual en ReceivedLog.
+  3. Si el bloque trae saltos de linea, separa los registros.
+  4. Cada registro se valida inmediatamente.
+  5. Si cumple el filtro del tipo seleccionado, se envia.
+  6. Si no cumple, se rechaza y se descarta.
+
+Ejemplo:
+
+  Recibe:
+    65N26112V
+
+  Resultado:
+    Codigo rechazado
+
+  Luego recibe:
+    H00088
+
+  Resultado:
+    Codigo rechazado
+
+  Nota:
+    No se combina 65N26112V + H00088.
+
+
+LOGS
+----
+La carpeta portable guarda logs en:
+
+  python_version\portable_exe\Logs
+
+Archivos:
+
+  ReceivedLog_YYYY-MM-DD.txt
+    Guarda todo lo recibido por TCP tal cual.
+
+  SentLog_YYYY-MM-DD.txt
+    Guarda solo los codigos que realmente se enviaron a HSmartTest.
+
+  TcpClientLog_YYYY-MM-DD.txt
+    Guarda eventos normales de pantalla: conectado, desconectado, OK y rechazado.
